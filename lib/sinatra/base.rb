@@ -376,8 +376,12 @@ module Sinatra
       return unless time
       time = time_for time
       response['Last-Modified'] = time.httpdate
+
+      if env['HTTP_IF_MODIFIED_SINCE']
       # compare based on seconds since epoch
-      halt 304 if Time.httpdate(env['HTTP_IF_MODIFIED_SINCE']).to_i >= time.to_i
+        since = Time.httpdate(env['HTTP_IF_MODIFIED_SINCE']).to_i
+        halt 304 if since >= time.to_i
+      end
     rescue ArgumentError
     end
 
